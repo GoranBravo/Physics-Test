@@ -1,0 +1,156 @@
+[gd_scene load_steps=13 format=3 uid="uid://bihommiy4t3uf"]
+
+[ext_resource type="Script" uid="uid://br1qoyn8ogfv6" path="res://Scripts/player.gd" id="1_y0qk3"]
+[ext_resource type="Texture2D" uid="uid://cmndr2matxcbu" path="res://Sprites/icon.png" id="2_3y5cq"]
+[ext_resource type="Script" uid="uid://b1nwpt6nlo6l0" path="res://Scripts/hook.gd" id="2_6t5aa"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_sh265"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4flbx"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="Animation" id="Animation_3y5cq"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D/Node3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.613693, -0.391456, -0.468114)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D/Node3D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_y0qk3"]
+resource_name = "ShootHook"
+length = 0.7
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D/Node3D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.7),
+"transitions": PackedFloat32Array(1, 0.5, 1),
+"update": 0,
+"values": [Vector3(0.613693, -0.391456, -0.468114), Vector3(0.613693, -0.391456, -0.371768), Vector3(0.613693, -0.391456, -0.468114)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D/Node3D:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.7),
+"transitions": PackedFloat32Array(1, 0.5, 1),
+"update": 0,
+"values": [Vector3(0, 0, 0), Vector3(0, 0, -0.190101), Vector3(0, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2i4gt"]
+_data = {
+&"RESET": SubResource("Animation_3y5cq"),
+&"ShootHook": SubResource("Animation_y0qk3")
+}
+
+[sub_resource type="BoxMesh" id="BoxMesh_y0qk3"]
+size = Vector3(0.2, 0.2, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8j60k"]
+albedo_color = Color(0.83792, 0.613398, 0.197808, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_cvnsp"]
+material = SubResource("StandardMaterial3D_8j60k")
+radius = 0.1
+height = 0.2
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_cvnsp"]
+radius = 0.07
+
+[node name="Player" type="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.84443)
+script = ExtResource("1_y0qk3")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_sh265")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_4flbx")
+
+[node name="HookAnimation" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_2i4gt")
+}
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.541091, 0)
+
+[node name="Node3D" type="Node3D" parent="Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.613693, -0.391456, -0.468114)
+
+[node name="HookGun" type="MeshInstance3D" parent="Camera3D/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.204482, 0.116866, 0.0993246)
+mesh = SubResource("BoxMesh_y0qk3")
+skeleton = NodePath("../../..")
+
+[node name="Hook" type="RigidBody3D" parent="Camera3D/Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.204482, 0.116866, -0.205792)
+collision_layer = 2
+collision_mask = 2
+freeze = true
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("2_6t5aa")
+
+[node name="HookSticky" type="MeshInstance3D" parent="Camera3D/Node3D/Hook"]
+mesh = SubResource("SphereMesh_cvnsp")
+skeleton = NodePath("../../../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Camera3D/Node3D/Hook"]
+shape = SubResource("SphereShape3D_cvnsp")
+
+[node name="HookCooldown" type="Timer" parent="."]
+wait_time = 0.7
+one_shot = true
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TextureRect" type="TextureRect" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -12.0
+offset_top = -12.0
+offset_right = 12.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_3y5cq")
+expand_mode = 1
+stretch_mode = 4
+
+[connection signal="shoot_hook" from="." to="Camera3D/Node3D/Hook" method="_on_player_shoot_hook"]
+[connection signal="hook_hit" from="Camera3D/Node3D/Hook" to="." method="_on_hook_hook_hit"]
+[connection signal="timeout" from="HookCooldown" to="." method="_on_hook_cooldown_timeout"]

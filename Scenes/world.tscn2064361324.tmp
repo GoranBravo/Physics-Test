@@ -1,0 +1,92 @@
+[gd_scene load_steps=10 format=3 uid="uid://ced7y4ba58arc"]
+
+[ext_resource type="PackedScene" uid="uid://bihommiy4t3uf" path="res://Objects/player.tscn" id="1_a02cp"]
+[ext_resource type="Texture2D" uid="uid://caxi28di7wltf" path="res://Sprites/13187581_1601.m10.i311.n029.S.c10.164511620 Seamless green grass vector pattern.jpg" id="1_go701"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yp4wr"]
+size = Vector3(50, 1, 50)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5a7ea"]
+albedo_texture = ExtResource("1_go701")
+normal_scale = 7.33
+uv1_scale = Vector3(15.05, 15.05, 15.05)
+
+[sub_resource type="QuadMesh" id="QuadMesh_go701"]
+material = SubResource("StandardMaterial3D_5a7ea")
+size = Vector2(48, 48)
+orientation = 1
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_a02cp"]
+size = Vector3(50, 10, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_go701"]
+albedo_color = Color(0.583402, 0.330099, 0.321414, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_5a7ea"]
+material = SubResource("StandardMaterial3D_go701")
+size = Vector2(48, 10)
+
+[sub_resource type="Environment" id="Environment_a02cp"]
+background_mode = 1
+background_color = Color(0.535243, 0.686283, 1, 1)
+ssao_enabled = true
+
+[node name="World" type="Node3D"]
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_yp4wr")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("QuadMesh_go701")
+skeleton = NodePath("../CollisionShape3D")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.312882, 0.949792, 0, -0.949792, 0.312882, 0, 8.58421, 0)
+shadow_enabled = true
+
+[node name="Player" parent="." instance=ExtResource("1_a02cp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.983552, 0)
+
+[node name="Border" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 24)
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Border"]
+transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, -2.18557e-08, 4, -48.5)
+shape = SubResource("BoxShape3D_a02cp")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Border"]
+transform = Transform3D(1, 0, 1.74846e-07, 0, 1, 0, -1.74846e-07, 0, 1, 0, 4, -48)
+mesh = SubResource("QuadMesh_5a7ea")
+skeleton = NodePath("../CollisionShape3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Border"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0.5)
+shape = SubResource("BoxShape3D_a02cp")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Border"]
+transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 4, 0)
+mesh = SubResource("QuadMesh_5a7ea")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Border"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -24.5, 4, -24)
+shape = SubResource("BoxShape3D_a02cp")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Border"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -24, 4, -24)
+mesh = SubResource("QuadMesh_5a7ea")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="Border"]
+transform = Transform3D(7.54979e-08, 0, -1, 0, 1, 0, 1, 0, 7.54979e-08, 24.5, 4, -24)
+shape = SubResource("BoxShape3D_a02cp")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="Border"]
+transform = Transform3D(7.54979e-08, 0, -1, 0, 1, 0, 1, 0, 7.54979e-08, 24, 4, -24)
+mesh = SubResource("QuadMesh_5a7ea")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_a02cp")
