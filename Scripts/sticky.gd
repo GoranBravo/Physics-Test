@@ -64,6 +64,7 @@ func _physics_process(delta: float) -> void:
 		if positionSnapped == originSnapped:
 			_retract_end()
 			#Resets the cooldown of the hook
+			hookCooldown.stop()
 			hookCooldown.timeout.emit()
 
 func _playerHookSticky_position() -> Vector3:

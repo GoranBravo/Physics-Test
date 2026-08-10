@@ -9,13 +9,14 @@ const SPEED = 5.0
 const JUMP_VELOCITY = 8
 
 #Force applied to the player movment when using the hook
-var hookImpulseStrength = 400
+var hookImpulseStrength = 50
 #Speed at which the player camera moves
 var cameraSensivity = 0.003
 #Dictates if the hook can be shot again
 var hookOnCooldown = false
 #If true, the hook has been shot
 var hookInMovment = false
+var playerFlying = false
 #Cordinates that dictate to where the player should move
 var angle : Vector3
 #If true, the sticky has landed something
@@ -23,7 +24,7 @@ var hit = false
 #Coordinates of where the sticky is when landed
 var stickyCords : Vector3
 #Records the last input given by the player
-var lastMovInput = Input.get_vector("left", "right", "up", "down")
+var playerImpulse = Vector3.ZERO
 
 #Calls the camera
 @onready var camera = $Camera3D
@@ -44,8 +45,6 @@ func _hook() -> void:
 		#hookAnimation.play("ShootHook")
 		#Stop the player from shooting the hook again
 		hookOnCooldown = true
-		#Start running the timer of the cooldown
-		hookCooldown.start()
 		#Send the signal telling the hook has been shot
 		shoot_hook.emit("shoot")
 		#Starts the hook movment
@@ -55,6 +54,10 @@ func _hook() -> void:
 	if Input.is_action_just_released("hook") and hookInMovment:
 		#Stops the hook movment
 		hookInMovment = false
+		playerImpulse = velocity
+		playerFlying = true
+		hookCooldown.start()
+		print("start")
 		#Stops the movment of the player by the hook
 		hit = false
 		#Tells the sticky to retract
@@ -78,14 +81,11 @@ func _process(_delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	#Get the input direction and handle the movement/deceleration.
 	var inputDir := Input.get_vector("left", "right", "up", "down")
-	if inputDir != Vector2.ZERO:
-		lastMovInput = inputDir
-	var direction := (transform.basis * Vector3(lastMovInput.x, 0, lastMovInput.y)).normalized()
+	var direction := (transform.basis * Vector3(inputDir.x, 0, inputDir.y)).normalized()
 	var horizontal_velocity := Vector3(velocity.x, 0, velocity.z)
 	var target_velocity := direction * SPEED
 	if is_on_floor():
 		angle = Vector3.ZERO
-		lastMovInput = Vector2.ZERO
 		horizontal_velocity = target_velocity
 		hookImpulseStrength = 400
 	else:
@@ -93,6 +93,8 @@ func _physics_process(delta: float) -> void:
 			target_velocity,
 			4 * SPEED * delta
 		)
+		if hookImpulseStrength > 70:
+			hookImpulseStrength = 50
 	velocity.x = horizontal_velocity.x
 	velocity.z = horizontal_velocity.z
 	# print(angle, "angle")
@@ -110,10 +112,16 @@ func _physics_process(delta: float) -> void:
 	#Defines the movment of the player to the position of wher the sticky has hit something
 	if hit:
 		angle = position.direction_to(stickyCords)
-		velocity = angle * hookImpulseStrength * get_physics_process_delta_time()
+		velocity += angle * hookImpulseStrength * delta
 		#Slowly increse the force at witch the player is draged by the hook to a limit
-		if hookImpulseStrength < 1200:
-			hookImpulseStrength += 10
+		if hookImpulseStrength < 60:
+			hookImpulseStrength += 1
+
+	if not is_on_floor() and playerFlying and !hookInMovment:
+		velocity.x = playerImpulse.x
+		velocity.z = playerImpulse.z
+	else:
+		playerFlying = false
 
 	#Runs the movment
 	move_and_slide()
