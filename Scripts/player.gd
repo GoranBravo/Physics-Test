@@ -49,7 +49,6 @@ func _hook() -> void:
 		shoot_hook.emit("shoot")
 		#Starts the hook movment
 		hookInMovment = true
-		print("shoot")
 	#If the player wants to retract the hook
 	if Input.is_action_just_released("hook") and hookInMovment:
 		#Stops the hook movment
@@ -57,12 +56,10 @@ func _hook() -> void:
 		playerImpulse = velocity
 		playerFlying = true
 		hookCooldown.start()
-		print("start")
 		#Stops the movment of the player by the hook
 		hit = false
 		#Tells the sticky to retract
 		shoot_hook.emit("retract")
-		print("retract")
 
 #Handles the camera movment
 func _unhandled_input(event) -> void:
@@ -81,18 +78,16 @@ func _process(_delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	#Get the input direction and handle the movement/deceleration.
 	var inputDir := Input.get_vector("left", "right", "up", "down")
+	#Defines the direction to where the player is faicing
 	var direction := (transform.basis * Vector3(inputDir.x, 0, inputDir.y)).normalized()
+	#Sets the direction of the horizontal movment to the player movment
 	var horizontal_velocity := Vector3(velocity.x, 0, velocity.z)
 	var target_velocity := direction * SPEED
 	if is_on_floor():
-		angle = Vector3.ZERO
 		horizontal_velocity = target_velocity
 		hookImpulseStrength = 400
 	else:
-		horizontal_velocity = horizontal_velocity.move_toward(
-			target_velocity,
-			4 * SPEED * delta
-		)
+		horizontal_velocity = horizontal_velocity.move_toward(target_velocity, delta)
 		if hookImpulseStrength > 70:
 			hookImpulseStrength = 50
 	velocity.x = horizontal_velocity.x
@@ -117,11 +112,13 @@ func _physics_process(delta: float) -> void:
 		if hookImpulseStrength < 60:
 			hookImpulseStrength += 1
 
-	if not is_on_floor() and playerFlying and !hookInMovment:
-		velocity.x = playerImpulse.x
-		velocity.z = playerImpulse.z
-	else:
-		playerFlying = false
+	if playerFlying and !hookInMovment:
+		if is_on_floor():
+			angle = Vector3.ZERO
+			playerFlying = false
+		else:
+			velocity.x = playerImpulse.x
+			velocity.z = playerImpulse.z
 
 	#Runs the movment
 	move_and_slide()
@@ -132,7 +129,6 @@ func _on_hook_cooldown_timeout() -> void:
 	shoot_hook.emit("reset")
 	#Reset the cooldown of the hook
 	hookOnCooldown = false
-	print("reset")
 
 #Activate when the sticky hit something
 func _on_hook_gun_2_hook_hit(cords) -> void:
