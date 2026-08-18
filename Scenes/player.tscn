@@ -57,7 +57,6 @@ skeleton = NodePath("../../..")
 shape = SubResource("SphereShape3D_cvnsp")
 
 [node name="HookCooldown" type="Timer" parent="."]
-wait_time = 2.0
 one_shot = true
 
 [node name="HUD" type="CanvasLayer" parent="."]

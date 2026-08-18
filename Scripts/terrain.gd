@@ -1,13 +1,16 @@
 @tool
 extends MeshInstance3D
 
+#Size of the mesh
 const size := 256.0
 
+#More resolution indicates a more detailed mesh
 @export_range(4, 256, 4) var resolution := 32:
 	set(new_resolution):
 		resolution = new_resolution
 		update_mesh()
 
+#Image noise from where the mesh is made
 @export var noise: FastNoiseLite:
 	set(new_noise):
 		noise = new_noise
@@ -15,18 +18,22 @@ const size := 256.0
 		if noise:
 			noise.changed.connect(update_mesh)
 
+#Maximun height of the mesh
 @export_range(4.0, 128.0, 4.0) var height := 64.0:
 	set(new_height):
 		height = new_height
 		material_override.set_shader_parameter("height", height * 2.0)
 		update_mesh()
-		
+
+#Gives collision when the mesh is loaded correctly
 func _ready() -> void:
 	update_collision()
 
+#Returns the float value of the "height" of the noise in a given point
 func get_height(x: float, y: float) -> float:
 	return noise.get_noise_2d(x, y) * height
 
+#Returns normalized coordintes of a point given, with its cooresponding height
 func get_normal(x: float, y: float) -> Vector3:
 	var epsilon := size / resolution
 	var normal := Vector3(
@@ -36,12 +43,15 @@ func get_normal(x: float, y: float) -> Vector3:
 	)
 	return normal.normalized()
 
+#When a chage in the parameters is made, this function updates the mesh form
 func update_mesh() -> void:
+	#Creates a plane with the size given
 	var plane := PlaneMesh.new()
 	plane.subdivide_depth = resolution
 	plane.subdivide_width = resolution
 	plane.size = Vector2(size, size)
 	
+	#Creates the array mesh with the plane and the height of the noise
 	var plane_arrays := plane.get_mesh_arrays()
 	var vertex_array: PackedVector3Array = plane_arrays[ArrayMesh.ARRAY_VERTEX]
 	var normal_array: PackedVector3Array = plane_arrays[ArrayMesh.ARRAY_NORMAL]
@@ -62,9 +72,11 @@ func update_mesh() -> void:
 		tangent_array[4 * i + 2] = tangent.z
 	
 	var array_mesh := ArrayMesh.new()
+	#Creates the mesh with triangles and the coordintes of the array mesh
 	array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, plane_arrays)
 	mesh = array_mesh
 
+#Creates the colsion creating polygons ecuals the triangles
 func update_collision() -> void:
 	var collision_shape := $StaticBody3D/TerrainCollision
 	
