@@ -78,9 +78,14 @@ func update_mesh() -> void:
 
 #Creates the colsion creating polygons ecuals the triangles
 func update_collision() -> void:
-	var collision_shape := $StaticBody3D/TerrainCollision
+	var Body = StaticBody3D.new()
+	var TerrainCollision = CollisionShape3D.new()
+	
+	Body.set_collision_layer_value(2,true)
+	Body.set_collision_mask_value(2,true)
+	add_child(Body)
 	
 	var shape := ConcavePolygonShape3D.new()
 	shape.set_faces(mesh.get_faces())
-	
-	collision_shape.shape = shape
+	TerrainCollision.set_shape(shape)
+	Body.add_child(TerrainCollision)
