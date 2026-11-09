@@ -15,19 +15,18 @@ const size := 256.0
 	set(new_noise):
 		noise = new_noise
 		update_mesh()
-		if noise:
-			noise.changed.connect(update_mesh)
 
 #Maximun height of the mesh
 @export_range(4.0, 128.0, 4.0) var height := 64.0:
 	set(new_height):
 		height = new_height
+		material_override = load("res://Sprites/shaderWorld.tres")
 		material_override.set_shader_parameter("height", height * 2.0)
 		update_mesh()
 
 #Gives collision when the mesh is loaded correctly
 func _ready() -> void:
-	update_collision()
+	update_mesh()
 
 #Returns the float value of the "height" of the noise in a given point
 func get_height(x: float, y: float) -> float:
@@ -75,6 +74,7 @@ func update_mesh() -> void:
 	#Creates the mesh with triangles and the coordintes of the array mesh
 	array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, plane_arrays)
 	mesh = array_mesh
+	update_collision()
 
 #Creates the colsion creating polygons ecuals the triangles
 func update_collision() -> void:
@@ -85,7 +85,7 @@ func update_collision() -> void:
 	Body.set_collision_mask_value(2,true)
 	add_child(Body)
 	
-	var shape := ConcavePolygonShape3D.new()
+	var shape = ConcavePolygonShape3D.new()
 	shape.set_faces(mesh.get_faces())
 	TerrainCollision.set_shape(shape)
 	Body.add_child(TerrainCollision)

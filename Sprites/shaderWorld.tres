@@ -1,0 +1,29 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://vghi7evbw38o"]
+
+[ext_resource type="Shader" uid="uid://ct7hc4hjh828j" path="res://Scripts/world.gdshader" id="1_uhwbc"]
+
+[sub_resource type="Gradient" id="Gradient_8j60k"]
+offsets = PackedFloat32Array(0.17741935, 0.29032257, 0.37096775, 0.45967743, 0.516129, 0.63709676, 0.75)
+colors = PackedColorArray(0.121569, 0.105882, 0.686275, 1, 0.81324, 0.6754047, 0.10278321, 1, 0, 0.337255, 0.0745098, 1, 0.09423272, 0.2167246, 0.06793541, 1, 0.168627, 0.121569, 0.0627451, 1, 0.16862746, 0.12156863, 0.0627451, 1, 0.937255, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_fo5ed"]
+gradient = SubResource("Gradient_8j60k")
+width = 512
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_5a7ea"]
+frequency = 0.005
+fractal_lacunarity = 1.7
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_8j60k"]
+width = 1024
+height = 1024
+noise = SubResource("FastNoiseLite_5a7ea")
+seamless = true
+as_normal_map = true
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_uhwbc")
+shader_parameter/height = 128.0
+shader_parameter/color_gradient = SubResource("GradientTexture1D_fo5ed")
+shader_parameter/normal_map = SubResource("NoiseTexture2D_8j60k")
