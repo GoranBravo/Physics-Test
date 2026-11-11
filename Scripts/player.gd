@@ -27,6 +27,7 @@ var stickyCords : Vector3
 var playerImpulse = Vector3.ZERO
 #Records the initial position of the player
 var initialPosition = Vector3.ZERO
+var godButton = false
 
 #Calls the camera
 @onready var camera = $Camera3D
@@ -79,6 +80,8 @@ func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("reset"):
 		velocity = Vector3.ZERO
 		position = initialPosition
+	if Input.is_action_just_pressed("godravityan"):
+		godButton = true
 
 #Runs the physics
 func _physics_process(delta: float) -> void:
@@ -130,7 +133,8 @@ func _physics_process(delta: float) -> void:
 	
 	#Adds the gravity.
 	if not is_on_floor() and velocity.y > -100:
-		velocity += get_gravity() * delta * 2
+		if godButton == false:
+			velocity += get_gravity() * delta * 2
 
 	#Handle jump.
 	if Input.is_action_just_pressed("jump") and is_on_floor():
